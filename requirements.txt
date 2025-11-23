@@ -1,6 +1,0 @@
-opencv-python
-cv2-enumerate-cameras
-numpy
-pyaudio
-psutil
-pytz
