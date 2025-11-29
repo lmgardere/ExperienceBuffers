@@ -50,10 +50,10 @@ fi
 pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
 
 # Copy systemd service file
-sudo cp experiencebuffers.service /etc/systemd/system/
+chmod 755 experiencebuffers.service
+sudo ln experiencebuffers.service /etc/systemd/system/experiencebuffers.service
 sudo systemctl --user daemon-reload
 sudo systemctl --user enable experiencebuffers.service
 sudo systemctl --user start experiencebuffers.service
 
 echo "ExperienceBuffers is now running in the background."
-
