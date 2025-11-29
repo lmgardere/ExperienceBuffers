@@ -55,7 +55,7 @@ sudo ln -sf $TARGET_DIR /root
 sudo ln -sf $HOME/.local/bin/EBServer /usr/local/bin
 
 # Copy systemd service file
-chmod 755 experiencebuffers.service
+chmod 644 experiencebuffers.service
 sudo ln -sf $TARGET_DIR/experiencebuffers.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable experiencebuffers.service
