@@ -1,0 +1,54 @@
+#!/bin/bash
+
+RTMP_TARGET_DIR="$HOME/ExperienceBuffers/bin/MediaMTX"
+RTMP_BIN="$RTMP_TARGET_DIR/mediamtx"
+
+echo "Setting up ExperienceBuffers on Raspberry Pi..."
+
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y python3 python3-pip
+
+# Optional: install system-level dependencies for audio/video
+sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 ffmpeg
+
+
+# Check if it is already installed
+if [ ! -f "$RTMP_BIN" ]; then
+    echo "MediaMTX not found, installing..."
+
+    # Detect OS and architecture
+    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    ARCH=$(uname -m)
+
+    case "$ARCH" in
+        x86_64) ARCH="amd64" ;;
+        aarch64) ARCH="arm64" ;;
+        armv7l) ARCH="armv7" ;;
+        *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+    esac
+
+    # Build download URL (example for v1.9.0)
+    VERSION="v1.15.4"
+    URL="https://github.com/bluenviron/mediamtx/releases/download/${VERSION}/mediamtx_${OS}_${ARCH}.tar.gz"
+
+    echo "Downloading $URL"
+    mkdir -p "$RTMP_TARGET_DIR"
+    curl -L "$URL" | tar -xz -C "$RTMP_TARGET_DIR"
+
+    echo "Installed MediaMTX to $RTMP_TARGET_DIR"
+# File exists but not executable
+elif [ ! -x "$RTMP_BIN" ]; then
+    echo "MediaMTX binary exists but is not executable. Fixing permissions..."
+    chmod +x "$RTMP_BIN"
+fi
+
+# Install your package
+pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+
+# Copy systemd service file
+sudo cp experiencebuffers.service /etc/systemd/system/
+sudo systemctl --user daemon-reload
+sudo systemctl --user enable experiencebuffers.service
+sudo systemctl --user start experiencebuffers.service
+
+echo "ExperienceBuffers is now running in the background."
