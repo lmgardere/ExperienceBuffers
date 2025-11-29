@@ -4,8 +4,8 @@ After=default.target
 
 [Service]
 Type=Simple
-ExecStart=%h/.local/bin/EBServer
-WorkingDirectory=%h/ExperienceBuffers
+ExecStart=/usr/local/bin/EBServer
+WorkingDirectory=/root/ExperienceBuffers
 Restart=always
 RestartSec=5
 StandardOutput=journal
