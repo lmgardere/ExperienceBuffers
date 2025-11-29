@@ -1,0 +1,2 @@
+BufferServerSetup text eol=lf
+BufferServerSetup chmod=+x
