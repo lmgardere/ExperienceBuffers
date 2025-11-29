@@ -44,6 +44,8 @@ if [ ! -f "$RTMP_BIN" ]; then
 elif [ ! -x "$RTMP_BIN" ]; then
     echo "MediaMTX binary exists but is not executable. Fixing permissions..."
     chmod +x "$RTMP_BIN"
+else
+	echo "MediaMTX is already installed to $RTMP_TARGET_DIR"
 fi
 
 # Install EBServer package
@@ -51,7 +53,7 @@ pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0
 
 # Copy systemd service file
 chmod 755 experiencebuffers.service
-sudo ln -s $TARGET_DIR/experiencebuffers.service /etc/systemd/system/
+sudo ln -sf $TARGET_DIR/experiencebuffers.service /etc/systemd/system/
 sudo systemctl --user daemon-reload
 sudo systemctl --user enable experiencebuffers.service
 sudo systemctl --user start experiencebuffers.service
