@@ -1,6 +1,7 @@
 #!/bin/bash
 
-RTMP_TARGET_DIR="$HOME/ExperienceBuffers/bin/MediaMTX"
+TARGET_DIR="$HOME/ExperienceBuffers"
+RTMP_TARGET_DIR="$TARGET_DIR/bin/MediaMTX"
 RTMP_BIN="$RTMP_TARGET_DIR/mediamtx"
 
 echo "Setting up ExperienceBuffers on Raspberry Pi..."
@@ -10,7 +11,6 @@ sudo apt install -y python3 python3-pip
 
 # Optional: install system-level dependencies for audio/video
 sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 ffmpeg
-
 
 # Check if it is already installed
 if [ ! -f "$RTMP_BIN" ]; then
@@ -42,7 +42,7 @@ elif [ ! -x "$RTMP_BIN" ]; then
     chmod +x "$RTMP_BIN"
 fi
 
-# Install your package
+# Install EBServer package
 pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
 
 # Copy systemd service file
