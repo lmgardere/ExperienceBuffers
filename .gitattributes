@@ -1,2 +1,3 @@
+BufferServerSetup text encoding=utf-8
 BufferServerSetup text eol=lf
 BufferServerSetup chmod=+x
