@@ -29,13 +29,17 @@ if [ ! -f "$RTMP_BIN" ]; then
 
     # Build download URL (example for v1.9.0)
     VERSION="v1.15.4"
-    URL="https://github.com/bluenviron/mediamtx/releases/download/${VERSION}/mediamtx_${OS}_${ARCH}.tar.gz"
+    URL="https://github.com/bluenviron/mediamtx/releases/download/${VERSION}/mediamtx_${VERSION}_${OS}_${ARCH}.tar.gz"
 
     echo "Downloading $URL"
     mkdir -p "$RTMP_TARGET_DIR"
     curl -L "$URL" | tar -xz -C "$RTMP_TARGET_DIR"
 
-    echo "Installed MediaMTX to $RTMP_TARGET_DIR"
+	if [ -x "$RTMP_BIN" ]; then
+    	echo "Successfull installed MediaMTX to $RTMP_TARGET_DIR"
+	else
+    	echo "Failed to install MediaMTX to $RTMP_TARGET_DIR"
+	fi
 # File exists but not executable
 elif [ ! -x "$RTMP_BIN" ]; then
     echo "MediaMTX binary exists but is not executable. Fixing permissions..."
