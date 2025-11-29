@@ -56,3 +56,4 @@ sudo systemctl --user enable experiencebuffers.service
 sudo systemctl --user start experiencebuffers.service
 
 echo "ExperienceBuffers is now running in the background."
+
