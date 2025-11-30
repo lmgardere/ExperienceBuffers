@@ -49,15 +49,15 @@ else
 fi
 
 # Install EBServer package
-python3 -m venv ebenv
-source ebenv/bin/activate
+python3 -m venv $TARGET_DIR/ebenv
+source $TARGET_DIR/ebenv/bin/activate
 pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
 
 sudo ln -sf $TARGET_DIR /root
-sudo ln -sf $HOME/ExperienceBuffers/ebenv/bin/EBServer /usr/local/bin
+sudo ln -sf $TARGET_DIR/ebenv/bin/EBServer /usr/local/bin
 
 # Copy systemd service file
-chmod 644 experiencebuffers.service
+chmod 644 $TARGET_DIR/experiencebuffers.service
 sudo ln -sf $TARGET_DIR/experiencebuffers.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable experiencebuffers.service
