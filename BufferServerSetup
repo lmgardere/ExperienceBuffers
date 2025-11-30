@@ -53,7 +53,6 @@ python3 -m venv ebenv
 source ebenv/bin/activate
 pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
 
-chmod 777 $TARGET_DIR
 sudo ln -sf $TARGET_DIR /root
 sudo ln -sf $HOME/ExperienceBuffers/ebenv/bin/EBServer /usr/local/bin
 
