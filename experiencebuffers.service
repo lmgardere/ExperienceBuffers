@@ -3,6 +3,7 @@ Description=ExperienceBuffers Python Service
 After=default.target
 
 [Service]
+User=root
 Type=Simple
 ExecStart=/usr/local/bin/EBServer
 WorkingDirectory=/root/ExperienceBuffers
