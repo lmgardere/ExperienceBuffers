@@ -51,7 +51,7 @@ fi
 # Install EBServer package
 python3 -m venv $TARGET_DIR/ebenv
 source $TARGET_DIR/ebenv/bin/activate
-pip3 install --force-reinstall --upgrade-strategy only-if-needed https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+pip3 install --force-reinstall --upgrade --upgrade-strategy only-if-needed https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
 
 sudo ln -sf $TARGET_DIR /root
 sudo ln -sf $TARGET_DIR/ebenv/bin/EBServer /usr/local/bin
