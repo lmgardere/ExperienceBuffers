@@ -9,8 +9,9 @@ ExecStart=/usr/local/bin/EBServer
 WorkingDirectory=/root/ExperienceBuffers
 Restart=always
 RestartSec=5
-StandardOutput=journal
-StandardError=journal
+StandardOutput=append:/root/ExperienceBuffers/logs/activity.log
+StandardError=inherit
 
 [Install]
 WantedBy=default.target
+
