@@ -55,8 +55,11 @@ chmod 700 $TARGET_DIR/piptmp
 # Install EBServer package
 python3 -m venv $TARGET_DIR/ebenv
 source $TARGET_DIR/ebenv/bin/activate
-TMPDIR=$TARGET_DIR/piptmp pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
-#TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+if [ "$1" == "refresh" ]; then
+	TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+else
+	TMPDIR=$TARGET_DIR/piptmp pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+fi
 
 rm -rf $TARGET_DIR/piptmp
 
