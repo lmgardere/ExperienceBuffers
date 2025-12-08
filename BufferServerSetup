@@ -58,7 +58,7 @@ source $TARGET_DIR/ebenv/bin/activate
 TMPDIR=$TARGET_DIR/piptmp pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
 #TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
 
-#rm -rf $TARGET_DIR/piptmp
+rm -rf $TARGET_DIR/piptmp
 
 sudo ln -sf $TARGET_DIR /root
 sudo ln -sf $TARGET_DIR/ebenv/bin/EBServer /usr/local/bin
