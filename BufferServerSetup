@@ -10,7 +10,7 @@ sudo apt update && sudo apt upgrade -y
 sudo apt install -y python3 python3-pip
 
 # Optional: install system-level dependencies for audio/video
-sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 ffmpeg python3-opencv
+sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 ffmpeg
 
 # Check if MediaMTX is already installed
 if [ ! -f "$RTMP_BIN" ]; then
@@ -48,11 +48,17 @@ else
 	echo "MediaMTX is already installed to $RTMP_TARGET_DIR"
 fi
 
+# Making temporary tmp space for pip within larger user directory to avoid running out of disk space during install
+mkdir -p $TARGET_DIR/piptmp
+chmod 700 $TARGET_DIR/piptmp
+
 # Install EBServer package
 python3 -m venv $TARGET_DIR/ebenv
 source $TARGET_DIR/ebenv/bin/activate
-pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
-#pip3 install --force-reinstall --no-deps https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+TMPDIR=$TARGET_DIR/piptmp pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+#TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+
+#rm -rf $TARGET_DIR/piptmp
 
 sudo ln -sf $TARGET_DIR /root
 sudo ln -sf $TARGET_DIR/ebenv/bin/EBServer /usr/local/bin
