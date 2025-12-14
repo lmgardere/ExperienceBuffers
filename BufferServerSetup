@@ -65,6 +65,12 @@ else
 	sudo apt install -y build-essentials cmake pkg-config libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libopenblas-dev liblapack-dev libblas-dev gfortran \
 			gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-libcamera libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
 	
+    echo "Making temporary 2GB swapfile to accommodate the memory intensive process of compiling OpenCV"
+	sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+	sudo chmod 600 /swapfile
+	sudo mkswap /swapfile
+	sudo swapon /swapfile
+
 	cd ~
 	git clone https://github.com/opencv/opencv.git
 	git clone https://github.com/opencv/opencv_contrib.git
@@ -97,6 +103,9 @@ else
 	
 	make -j2
 	sudo make install
+	
+	sudo swapoff /swapfile
+	sudo rm /swapfile	
 fi
 
 # Check if MediaMTX is already installed
