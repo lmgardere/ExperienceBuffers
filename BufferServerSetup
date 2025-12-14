@@ -88,6 +88,7 @@ else
 	      -D BUILD_opencv_stitching=OFF \
 	      -D BUILD_opencv_superres=OFF \
 	      -D BUILD_opencv_videostab=OFF \
+		  -D BUILD_opencv_gapi=OFF \
 	      -D WITH_QT=OFF \
 	      -D WITH_GTK=OFF \
 	      -D WITH_OPENGL=OFF \
