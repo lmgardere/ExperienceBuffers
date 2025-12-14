@@ -1,5 +1,16 @@
 #!/bin/bash
 
+# Detect OS and architecture
+OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+ARCH=$(uname -m)
+
+case "$ARCH" in
+    x86_64) ARCH="amd64" ;;
+    aarch64) ARCH="arm64" ;;
+    armv7l) ARCH="armv7" ;;
+    *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
+esac
+
 TARGET_DIR="$HOME/ExperienceBuffers"
 RTMP_TARGET_DIR="$TARGET_DIR/bin/MediaMTX"
 RTMP_BIN="$RTMP_TARGET_DIR/mediamtx"
@@ -7,27 +18,89 @@ RTMP_BIN="$RTMP_TARGET_DIR/mediamtx"
 echo "Setting up ExperienceBuffers on Raspberry Pi..."
 
 sudo apt update && sudo apt upgrade -y
-sudo apt install -y python3 python3-pip
 
-# Optional: install system-level dependencies for audio/video
-sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-dev ffmpeg \
-		gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-libcamera
+# Installing necessary python tools
+sudo apt install -y python3 python3-pip python3-numpy
 
+# Install system-level dependencies for audio/video - ie: audio tools and ffmpeg
+sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-dev ffmpeg
+
+# Test if OpenCV and GStreamer are working together. If not, build OpenCV with GStreamer support.
+python3 - <<'EOF'
+import sys
+
+try:
+    import cv2
+except ImportError:
+    print("OpenCV (cv2) is not installed.")
+    sys.exit(1)
+
+print("OpenCV found. Version:", cv2.__version__)
+
+info = cv2.getBuildInformation()
+gst_enabled = "GStreamer: YES" in info
+print("GStreamer enabled:", gst_enabled)
+
+print("Testing GStreamer pipeline:")
+pipeline = "videotestsrc num-buffers=1 ! videoconvert ! appsink"
+cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+ret, frame = cap.read()
+cap.release()
+
+print("Pipeline opened:", cap.isOpened())
+print("Frame captured:", ret)
+
+# Exit code: 0 if OpenCV exists, has GStreamer, and pipeline works
+if gst_enabled and cap.isOpened() and ret:
+    sys.exit(0)
+else:
+    sys.exit(1)
+EOF
+
+if [ $? -eq 0 ]; then
+    echo "OpenCV + GStreamer are working. No rebuild needed."
+else
+    echo "OpenCV + GStreamer test failed. Starting rebuild. This may take a few hours on cpu limited devices..."
+
+	sudo apt install -y build-essentials cmake pkg-config libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libopenblas-dev liblapack-dev libblas-dev gfortran \
+			gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-libcamera libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
+	
+	cd ~
+	git clone https://github.com/opencv/opencv.git
+	git clone https://github.com/opencv/opencv_contrib.git
+	
+	cd ~/opencv
+	mkdir build && cd build
+			
+	cmake -D CMAKE_BUILD_TYPE=Release \
+	      -D CMAKE_INSTALL_PREFIX=/usr/local \
+	      -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
+	      -D WITH_GSTREAMER=ON \
+	      -D BUILD_opencv_python3=ON \
+	      -D BUILD_opencv_highgui=OFF \
+	      -D BUILD_opencv_imgcodecs=ON \
+	      -D BUILD_opencv_videoio=ON \
+	      -D BUILD_opencv_dnn=OFF \
+	      -D BUILD_opencv_flann=OFF \
+	      -D BUILD_opencv_ml=OFF \
+	      -D BUILD_opencv_objdetect=OFF \
+	      -D BUILD_opencv_photo=OFF \
+	      -D BUILD_opencv_stitching=OFF \
+	      -D BUILD_opencv_superres=OFF \
+	      -D BUILD_opencv_videostab=OFF \
+	      -D WITH_QT=OFF \
+	      -D WITH_GTK=OFF \
+	      -D WITH_OPENGL=OFF \
+	      -D CPU_BASELINE=DETECT \
+	      ..
+	
+	make -j2
+	sudo make install
+fi
 
 # Check if MediaMTX is already installed
 if [ ! -f "$RTMP_BIN" ]; then
     echo "MediaMTX not found, installing..."
-
-    # Detect OS and architecture
-    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
-    ARCH=$(uname -m)
-
-    case "$ARCH" in
-        x86_64) ARCH="amd64" ;;
-        aarch64) ARCH="arm64" ;;
-        armv7l) ARCH="armv7" ;;
-        *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
-    esac
 
     # Build download URL (example for v1.9.0)
     VERSION="v1.15.4"
@@ -47,10 +120,10 @@ elif [ ! -x "$RTMP_BIN" ]; then
     echo "MediaMTX binary exists but is not executable. Fixing permissions..."
     chmod +x "$RTMP_BIN"
 else
-	echo "MediaMTX is already installed to $RTMP_TARGET_DIR"
+	echo "MediaMTX is already correctly installed to $RTMP_TARGET_DIR"
 fi
 
-# Making temporary tmp space for pip within larger user directory to avoid running out of disk space during install
+# Making temporary tmp space for pip within larger user directory to avoid running out of disk space during pip installs
 mkdir -p $TARGET_DIR/piptmp
 chmod 700 $TARGET_DIR/piptmp
 
@@ -73,6 +146,6 @@ chmod 644 $TARGET_DIR/experiencebuffersserver.service
 sudo ln -sf $TARGET_DIR/experiencebuffersserver.service /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable experiencebuffersserver.service
-#sudo systemctl start experiencebuffersserver.service
+sudo systemctl start experiencebuffersserver.service
 
 echo "ExperienceBuffers is now running in the background."
