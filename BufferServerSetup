@@ -60,7 +60,7 @@ opened=cap.isOpened()
 cap.release()
 
 print("GStreamer pipeline working:",opened)
-print("Frame capture working:",ret)
+print("OpenCV frame capture working:",ret)
 
 # Exit code: 0 if OpenCV exists, has GStreamer, and pipeline works
 if gst_enabled and opened and ret:
