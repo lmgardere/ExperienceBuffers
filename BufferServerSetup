@@ -86,6 +86,7 @@ cmake -D CMAKE_BUILD_TYPE=Release \
 	      -D BUILD_opencv_imgcodecs=ON \
 	      -D BUILD_opencv_videoio=ON \
 	      -D BUILD_opencv_calib3d=OFF \
+	      -D BUILD_opencv_stereo=OFF \
 	      -D BUILD_opencv_highgui=OFF \
 	      -D BUILD_opencv_dnn=OFF \
 	      -D BUILD_opencv_flann=OFF \
