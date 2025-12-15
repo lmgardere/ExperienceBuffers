@@ -78,13 +78,30 @@ else
 	cd ~/opencv
 	mkdir build && cd build
 			
-cmake -D CMAKE_BUILD_TYPE=Release \
+	cmake -D CMAKE_BUILD_TYPE=Release \
 	      -D CMAKE_INSTALL_PREFIX=/usr/local \
 	      -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
 	      -D WITH_GSTREAMER=ON \
+	      -D BUILD_opencv_core=ON \
+	      -D BUILD_opencv_imgproc=ON \
 	      -D BUILD_opencv_python3=ON \
 	      -D BUILD_opencv_imgcodecs=ON \
 	      -D BUILD_opencv_videoio=ON \
+	      -D BUILD_opencv_video=ON \
+	      -D BUILD_opencv_bioinspired=OFF \
+	      -D BUILD_opencv_features2d=OFF \
+	      -D BUILD_opencv_freetype=OFF \
+	      -D BUILD_opencv_fuzzy=OFF \
+	      -D BUILD_opencv_hfs=OFF \
+	      -D BUILD_opencv_img_hash=OFF \
+	      -D BUILD_opencv_intensity_transform=OFF \
+	      -D BUILD_opencv_line_descriptor=OFF \
+	      -D BUILD_opencv_phase_unwrapping=OFF \
+	      -D BUILD_opencv_plot=OFF \
+	      -D BUILD_opencv_reg=OFF \
+	      -D BUILD_opencv_saliency=OFF \
+	      -D BUILD_opencv_signal=OFF \
+	      -D BUILD_opencv_tracking=OFF \
 	      -D BUILD_opencv_calib3d=OFF \
 	      -D BUILD_opencv_stereo=OFF \
 	      -D BUILD_opencv_highgui=OFF \
