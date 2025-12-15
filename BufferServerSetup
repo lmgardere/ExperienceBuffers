@@ -78,14 +78,15 @@ else
 	cd ~/opencv
 	mkdir build && cd build
 			
-	cmake -D CMAKE_BUILD_TYPE=Release \
+cmake -D CMAKE_BUILD_TYPE=Release \
 	      -D CMAKE_INSTALL_PREFIX=/usr/local \
 	      -D OPENCV_EXTRA_MODULES_PATH=~/opencv_contrib/modules \
 	      -D WITH_GSTREAMER=ON \
 	      -D BUILD_opencv_python3=ON \
-	      -D BUILD_opencv_highgui=OFF \
 	      -D BUILD_opencv_imgcodecs=ON \
 	      -D BUILD_opencv_videoio=ON \
+	      -D BUILD_opencv_calib3d=OFF \
+	      -D BUILD_opencv_highgui=OFF \
 	      -D BUILD_opencv_dnn=OFF \
 	      -D BUILD_opencv_flann=OFF \
 	      -D BUILD_opencv_ml=OFF \
@@ -100,7 +101,7 @@ else
 	      -D WITH_OPENGL=OFF \
 	      -D CPU_BASELINE=DETECT \
 	      ..
-	
+
 	make -j2
 	sudo make install
 	
