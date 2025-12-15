@@ -25,7 +25,7 @@ sudo apt install -y python3 python3-pip python3-numpy
 # Install system-level dependencies for audio/video - ie: audio tools and ffmpeg
 sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-dev ffmpeg
 
-echo "Testing if OpenCV + GStreamer are working..."
+echo "Testing if OpenCV + GStreamer is working..."
 python3 - <<'EOF'
 import sys,re,os
 
@@ -70,7 +70,7 @@ else:
 EOF
 
 if [ $? -eq 0 ]; then
-    echo "OpenCV + GStreamer are working. No rebuild needed."
+    echo "OpenCV + GStreamer is working. No rebuild needed."
 else
     echo "OpenCV + GStreamer test failed. Starting rebuild. This may take over an hour on cpu limited devices..."
 
