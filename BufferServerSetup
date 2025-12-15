@@ -27,7 +27,7 @@ sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-de
 
 # Test if OpenCV and GStreamer are working together. If not, build OpenCV with GStreamer support.
 python3 - <<'EOF'
-import sys
+import sys,re,os
 
 try:
     import cv2
@@ -37,21 +37,33 @@ except ImportError:
 
 print("OpenCV found. Version:", cv2.__version__)
 
-info = cv2.getBuildInformation()
-gst_enabled = "GStreamer: YES" in info
+info=cv2.getBuildInformation()
+gst_enabled=bool(re.search(r"GStreamer:\s*YES", info))
 print("GStreamer enabled:", gst_enabled)
 
-print("Testing GStreamer pipeline:")
-pipeline = "videotestsrc num-buffers=1 ! videoconvert ! appsink"
-cap = cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
-ret, frame = cap.read()
+pipeline="libcamerasrc ! videoconvert ! appsink"
+
+fd_null = os.open(os.devnull, os.O_WRONLY)
+orig_stdout_fd = os.dup(1)
+orig_stderr_fd = os.dup(2)
+os.dup2(fd_null, 1)
+os.dup2(fd_null, 2)
+
+cap=cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+
+os.dup2(orig_stdout_fd, 1)
+os.dup2(orig_stderr_fd, 2)
+os.close(fd_null)
+
+ret,frame=cap.read()
+opened=cap.isOpened()
 cap.release()
 
-print("Pipeline opened:", cap.isOpened())
-print("Frame captured:", ret)
+print("GStreamer pipeline working:",opened)
+print("Frame capture working:",ret)
 
 # Exit code: 0 if OpenCV exists, has GStreamer, and pipeline works
-if gst_enabled and cap.isOpened() and ret:
+if gst_enabled and opened and ret:
     sys.exit(0)
 else:
     sys.exit(1)
@@ -60,7 +72,7 @@ EOF
 if [ $? -eq 0 ]; then
     echo "OpenCV + GStreamer are working. No rebuild needed."
 else
-    echo "OpenCV + GStreamer test failed. Starting rebuild. This may take a few hours on cpu limited devices..."
+    echo "OpenCV + GStreamer test failed. Starting rebuild. This may take over an hour on cpu limited devices..."
 
 	sudo apt install -y build-essentials cmake pkg-config libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libopenblas-dev liblapack-dev libblas-dev gfortran \
 			gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-libcamera libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
@@ -119,7 +131,7 @@ else
 	      -D WITH_OPENGL=OFF \
 	      -D CPU_BASELINE=DETECT \
 	      ..
-
+	
 	make -j2
 	sudo make install
 	
