@@ -41,7 +41,7 @@ info=cv2.getBuildInformation()
 gst_enabled=bool(re.search(r"GStreamer:\s*YES", info))
 print("GStreamer enabled:", gst_enabled)
 
-pipeline="libcamerasrc ! videoconvert ! appsink"
+pipeline="videotestsrc ! videoconvert ! appsink"
 
 fd_null = os.open(os.devnull, os.O_WRONLY)
 orig_stdout_fd = os.dup(1)
