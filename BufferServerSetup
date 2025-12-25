@@ -1,5 +1,9 @@
 #!/bin/bash
+set -euo pipefail
 
+# -------------------------------------------------------------
+# CONFIGURATION
+# -------------------------------------------------------------
 # Detect OS and architecture
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
@@ -11,78 +15,104 @@ case "$ARCH" in
     *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
+SERVICE_NAME="experiencebuffersserver.service"
 TARGET_DIR="$HOME/ExperienceBuffers"
 RTMP_TARGET_DIR="$TARGET_DIR/bin/MediaMTX"
 RTMP_BIN="$RTMP_TARGET_DIR/mediamtx"
 
-echo "Setting up ExperienceBuffers on Raspberry Pi..."
+# -------------------------------------------------------------
+# FUNCTIONS
+# -------------------------------------------------------------
 
-sudo apt update && sudo apt upgrade -y
+# -------------------------------------------------------------
+checkRequirements() {
+	echo
+    echo "Checking system requirements..."
 
-# Installing necessary python tools
-sudo apt install -y python3 python3-pip python3-numpy
+	sudo apt update && sudo apt upgrade -y
+	
+	# Installing necessary python tools
+	sudo apt install -y python3 python3-pip python3-numpy
+	
+	# Install system-level dependencies for audio/video - ie: audio tools and ffmpeg
+	sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-dev ffmpeg
+	
+	echo "Testing if OpenCV + GStreamer is working..."
+	testOpenCV
+	
+	if [ $? -eq 0 ]; then
+	    echo "OpenCV + GStreamer is working. No rebuild needed."
+	else
+	    echo "OpenCV + GStreamer test failed. Starting rebuild. This may take over an hour on cpu limited devices..."
 
-# Install system-level dependencies for audio/video - ie: audio tools and ffmpeg
-sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-dev ffmpeg
+	    echo "Making temporary swapfile to accommodate the memory intensive process of compiling OpenCV"
+		sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+		sudo chmod 600 /swapfile
+		sudo mkswap /swapfile
+		sudo swapon /swapfile
 
-echo "Testing if OpenCV + GStreamer is working..."
-python3 - <<'EOF'
-import sys,re,os
+	    buildOpenCV
 
-try:
-    import cv2
-except ImportError:
-    print("OpenCV (cv2) is not installed.")
-    sys.exit(1)
+		echo "Removing temporary swapfile"
+		sudo swapoff /swapfile
+		sudo rm /swapfile	
+	
+	fi
+}
 
-print("OpenCV found. Version:", cv2.__version__)
+# -------------------------------------------------------------
+testOpenCV(){
+	python3 - <<'EOF'
+	import sys,re,os
+	
+	try:
+	    import cv2
+	except ImportError:
+	    print("OpenCV (cv2) is not installed.")
+	    sys.exit(1)
+	
+	print("OpenCV found. Version:", cv2.__version__)
+	
+	info=cv2.getBuildInformation()
+	gstEnabled=bool(re.search(r"GStreamer:\s*YES", info))
+	print("GStreamer enabled:", gstEnabled)
+	
+	pipeline="videotestsrc ! videoconvert ! appsink"
+	
+	fd_null = os.open(os.devnull, os.O_WRONLY)
+	orig_stdout_fd = os.dup(1)
+	orig_stderr_fd = os.dup(2)
+	os.dup2(fd_null, 1)
+	os.dup2(fd_null, 2)
+	
+	cap=cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
+	
+	os.dup2(orig_stdout_fd, 1)
+	os.dup2(orig_stderr_fd, 2)
+	os.close(fd_null)
+	
+	opened=cap.isOpened()
+	
+	ret,frame=cap.read()
+	
+	cap.release()
+	
+	print("GStreamer pipeline working:",opened)
+	print("OpenCV frame capture working:",ret)
+	
+	# Exit code: 0 if OpenCV exists, has GStreamer, and pipeline works
+	if gstEnabled and opened and ret:
+	    sys.exit(0)
+	else:
+	    sys.exit(1)
+	EOF
+}
 
-info=cv2.getBuildInformation()
-gst_enabled=bool(re.search(r"GStreamer:\s*YES", info))
-print("GStreamer enabled:", gst_enabled)
-
-pipeline="videotestsrc ! videoconvert ! appsink"
-
-fd_null = os.open(os.devnull, os.O_WRONLY)
-orig_stdout_fd = os.dup(1)
-orig_stderr_fd = os.dup(2)
-os.dup2(fd_null, 1)
-os.dup2(fd_null, 2)
-
-cap=cv2.VideoCapture(pipeline, cv2.CAP_GSTREAMER)
-
-os.dup2(orig_stdout_fd, 1)
-os.dup2(orig_stderr_fd, 2)
-os.close(fd_null)
-
-ret,frame=cap.read()
-opened=cap.isOpened()
-cap.release()
-
-print("GStreamer pipeline working:",opened)
-print("OpenCV frame capture working:",ret)
-
-# Exit code: 0 if OpenCV exists, has GStreamer, and pipeline works
-if gst_enabled and opened and ret:
-    sys.exit(0)
-else:
-    sys.exit(1)
-EOF
-
-if [ $? -eq 0 ]; then
-    echo "OpenCV + GStreamer is working. No rebuild needed."
-else
-    echo "OpenCV + GStreamer test failed. Starting rebuild. This may take over an hour on cpu limited devices..."
-
+# -------------------------------------------------------------
+buildOpenCV(){
 	sudo apt install -y build-essentials cmake pkg-config libjpeg-dev libpng-dev libtiff-dev libavcodec-dev libavformat-dev libswscale-dev libv4l-dev libxvidcore-dev libx264-dev libopenblas-dev liblapack-dev libblas-dev gfortran \
 			gstreamer1.0-tools gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly gstreamer1.0-libav gstreamer1.0-libcamera libgstreamer-plugins-base1.0-dev libgstreamer1.0-dev
 	
-    echo "Making temporary 2GB swapfile to accommodate the memory intensive process of compiling OpenCV"
-	sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
-	sudo chmod 600 /swapfile
-	sudo mkswap /swapfile
-	sudo swapon /swapfile
-
 	cd ~
 	git clone https://github.com/opencv/opencv.git
 	git clone https://github.com/opencv/opencv_contrib.git
@@ -133,60 +163,84 @@ else
 	      ..
 	
 	make -j2
-	sudo make install
+	sudo make install	
+}
+
+# -------------------------------------------------------------
+installMediaMTX(){
+	# Check if MediaMTX is already installed
+	if [ ! -f "$RTMP_BIN" ]; then
+	    echo "MediaMTX not found, installing..."
 	
-	sudo swapoff /swapfile
-	sudo rm /swapfile	
-fi
-
-# Check if MediaMTX is already installed
-if [ ! -f "$RTMP_BIN" ]; then
-    echo "MediaMTX not found, installing..."
-
-    # Build download URL (example for v1.9.0)
-    VERSION="v1.15.4"
-    URL="https://github.com/bluenviron/mediamtx/releases/download/${VERSION}/mediamtx_${VERSION}_${OS}_${ARCH}.tar.gz"
-
-    echo "Downloading $URL"
-    mkdir -p "$RTMP_TARGET_DIR"
-    curl -L "$URL" | tar -xz -C "$RTMP_TARGET_DIR"
-
-	if [ -x "$RTMP_BIN" ]; then
-    	echo "Successfull installed MediaMTX to $RTMP_TARGET_DIR"
+	    # Build download URL (example for v1.9.0)
+	    VERSION="v1.15.4"
+	    URL="https://github.com/bluenviron/mediamtx/releases/download/${VERSION}/mediamtx_${VERSION}_${OS}_${ARCH}.tar.gz"
+	
+	    echo "Downloading $URL"
+	    mkdir -p "$RTMP_TARGET_DIR"
+	    curl -L "$URL" | tar -xz -C "$RTMP_TARGET_DIR"
+	
+		if [ -x "$RTMP_BIN" ]; then
+	    	echo "Successfully installed MediaMTX to $RTMP_TARGET_DIR"
+		else
+	    	echo "Failed to install MediaMTX to $RTMP_TARGET_DIR"
+		fi
+	# File exists but not executable
+	elif [ ! -x "$RTMP_BIN" ]; then
+	    echo "MediaMTX binary exists but is not executable. Fixing permissions..."
+	    chmod +x "$RTMP_BIN"
 	else
-    	echo "Failed to install MediaMTX to $RTMP_TARGET_DIR"
+		echo "MediaMTX is already correctly installed to $RTMP_TARGET_DIR"
 	fi
-# File exists but not executable
-elif [ ! -x "$RTMP_BIN" ]; then
-    echo "MediaMTX binary exists but is not executable. Fixing permissions..."
-    chmod +x "$RTMP_BIN"
-else
-	echo "MediaMTX is already correctly installed to $RTMP_TARGET_DIR"
-fi
+}
 
-# Making temporary tmp space for pip within larger user directory to avoid running out of disk space during pip installs
-mkdir -p $TARGET_DIR/piptmp
-chmod 700 $TARGET_DIR/piptmp
+# -------------------------------------------------------------
+installEBServer(){
+	echo
+	# Making temporary tmp space for pip within larger user directory to avoid running out of disk space during pip installs
+	mkdir -p $TARGET_DIR/piptmp
+	chmod 700 $TARGET_DIR/piptmp
+	
+	# Install EBServer package
+	python3 -m venv --system-site-packages $TARGET_DIR/ebenv
+	source $TARGET_DIR/ebenv/bin/activate
+	if [ "$1" == "refresh" ]; then
+	    echo "Refreshing EBServer..."
+		TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+	else
+	    echo "Installing EBServer and requirements..."
+		TMPDIR=$TARGET_DIR/piptmp pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
+	fi
+	
+	rm -rf $TARGET_DIR/piptmp
+}
 
-# Install EBServer package
-python3 -m venv --system-site-packages $TARGET_DIR/ebenv
-source $TARGET_DIR/ebenv/bin/activate
-if [ "$1" == "refresh" ]; then
-	TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
-else
-	TMPDIR=$TARGET_DIR/piptmp pip3 install https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/experiencebuffersserver-0.1.0-py3-none-any.whl
-fi
+# -------------------------------------------------------------
+createService() {
+	echo
+    echo "Creating systemd service..."
+    
+	sudo ln -sf $TARGET_DIR /root
+	sudo ln -sf $TARGET_DIR/ebenv/bin/EBServer /usr/local/bin
+	
+	# Copy systemd service file
+	chmod 644 $TARGET_DIR/$SERVICE_NAME
+	sudo ln -sf $TARGET_DIR/$SERVICE_NAME /etc/systemd/system/
+	sudo systemctl daemon-reload
+	sudo systemctl enable $SERVICE_NAME
+	sudo systemctl start $SERVICE_NAME
+	
+    echo "Service ${SERVICE_NAME} installed and started."
 
-rm -rf $TARGET_DIR/piptmp
+# -------------------------------------------------------------
+main() {
+    echo "=== ${SERVICE_NAME} Installer ==="
+    checkRequirements
+    installMediaMTX
+    installEBServer
+    createService
+    echo "Installation complete."
+}
 
-sudo ln -sf $TARGET_DIR /root
-sudo ln -sf $TARGET_DIR/ebenv/bin/EBServer /usr/local/bin
-
-# Copy systemd service file
-chmod 644 $TARGET_DIR/experiencebuffersserver.service
-sudo ln -sf $TARGET_DIR/experiencebuffersserver.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable experiencebuffersserver.service
-#sudo systemctl start experiencebuffersserver.service
-
-echo "ExperienceBuffers is now running in the background."
+# -------------------------------------------------------------
+main
