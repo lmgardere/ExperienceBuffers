@@ -33,7 +33,7 @@ installJar() {
 	echo
     echo "Installing JAR..."
 	
-	URL="https://github.com/lmgardere/ExperienceBuffers/releases/download/v0.1.0/$JAR_NAME"
+	URL="https://github.com/lmgardere/ExperienceBuffers/releases/latest/download/$JAR_NAME"
 	
 	echo "Downloading $URL"
     sudo mkdir -p $INSTALL_DIR
@@ -80,3 +80,4 @@ main() {
 # -------------------------------------------------------------
 
 main
+
