@@ -5,7 +5,7 @@ After=default.target
 [Service]
 User=root
 Type=Simple
-ExecStart=/usr/bin/java -jar /root/ExperienceBuffers/BufferCoordinator.jar
+ExecStart=/usr/bin/java -jar /root/ExperienceBuffers/EBCoordinator.jar
 WorkingDirectory=/root/ExperienceBuffers
 Restart=always
 RestartSec=5
@@ -15,3 +15,4 @@ SuccessExitStatus=143
 
 [Install]
 WantedBy=default.target
+
