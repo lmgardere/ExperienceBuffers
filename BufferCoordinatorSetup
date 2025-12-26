@@ -4,7 +4,7 @@ set -euo pipefail
 # -------------------------------------------------------------
 # CONFIGURATION
 # -------------------------------------------------------------
-JAR_NAME="BufferCoordinator.jar"
+JAR_NAME="EBCoordinator.jar"
 SERVICE_NAME="experiencebufferscoordinator.service"
 TARGET_DIR="$HOME/ExperienceBuffers"
 INSTALL_DIR="${TARGET_DIR}/lib"
@@ -80,4 +80,5 @@ main() {
 # -------------------------------------------------------------
 
 main
+
 
