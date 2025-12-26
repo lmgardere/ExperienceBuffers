@@ -232,6 +232,7 @@ createService() {
 	#sudo systemctl start $SERVICE_NAME
 	
     echo "Service ${SERVICE_NAME} installed and started."
+}
 
 # -------------------------------------------------------------
 main() {
