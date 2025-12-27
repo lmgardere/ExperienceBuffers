@@ -22,6 +22,7 @@ checkRequirements() {
     sudo apt update && sudo apt upgrade -y
     
     # Check Java
+    echo
     if command -v java >/dev/null 2>&1; then
         echo "Java found: $(java -version 2>&1 | head -n 1)"
     else
