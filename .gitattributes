@@ -1,6 +1,4 @@
 BufferServerSetup text encoding=utf-8
 BufferServerSetup text eol=lf
-BufferServerSetup chmod=+x
 BufferCoordinatorSetup text encoding=utf-8
 BufferCoordinatorSetup text eol=lf
-BufferCoordinatorSetup chmod=+x
