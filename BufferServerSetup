@@ -206,7 +206,7 @@ installEBServer(){
 	URL="https://github.com/lmgardere/$PROJECT_NAME/releases/latest/download/experiencebuffersserver-0.1.0-py3-none-any.whl"
 	python3 -m venv --system-site-packages $TARGET_DIR/ebenv
 	source $TARGET_DIR/ebenv/bin/activate
-	if [ "${1:-}" == "refresh" ]; then
+	if [ "${1:-}" = "refresh" ]; then
 	    echo "Refreshing EBServer..."
 		TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps $URL
 	else
