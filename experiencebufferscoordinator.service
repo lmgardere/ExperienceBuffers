@@ -5,7 +5,7 @@ After=default.target
 [Service]
 User=root
 Type=Simple
-ExecStart=/usr/bin/java -jar /root/ExperienceBuffers/EBCoordinator.jar
+ExecStart=/usr/bin/java -jar /root/ExperienceBuffers/lib/EBCoordinator.jar
 WorkingDirectory=/root/ExperienceBuffers
 Restart=always
 RestartSec=5

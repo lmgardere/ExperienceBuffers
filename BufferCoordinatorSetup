@@ -63,7 +63,7 @@ createService() {
 	sudo ln -sf $TARGET_DIR/$SERVICE_NAME /etc/systemd/system/
     sudo systemctl daemon-reload
     sudo systemctl enable $SERVICE_NAME
-    sudo systemctl restart $SERVICE_NAME
+    #sudo systemctl start $SERVICE_NAME
 
     echo "Service ${SERVICE_NAME} installed and started."
 }
