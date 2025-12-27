@@ -19,14 +19,13 @@ checkRequirements() {
 	echo
     echo "Checking system requirements..."
 
-    sudo apt update && sudo apt upgrade -y
-    
     # Check Java
     echo
     if command -v java >/dev/null 2>&1; then
         echo "Java found: $(java -version 2>&1 | head -n 1)"
     else
         echo "Java not found. Installing OpenJDK..."
+	    sudo apt update && sudo apt upgrade -y
         sudo apt install -y default-jdk
     fi
 }
@@ -57,10 +56,8 @@ createService() {
 	echo
     echo "Creating systemd service..."
 
-    sudo mkdir -p /root/$PROJECT_NAME
-    #if [ ! -e /root/$PROJECT_NAME/lib ]; then
-    #	sudo ln -sf $INSTALL_DIR /root/$PROJECT_NAME
-    #fi
+   	sudo ln -sf $INSTALL_DIR /root
+
     sudo mkdir -p /usr/lib/$PROJECT_NAME
     sudo ln -sf $INSTALL_DIR/$JAR_NAME /usr/lib/$PROJECT_NAME
 	
