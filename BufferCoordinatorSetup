@@ -62,11 +62,11 @@ createService() {
     #	sudo ln -sf $INSTALL_DIR /root/$PROJECT_NAME
     #fi
     sudo mkdir -p /usr/lib/$PROJECT_NAME
-    #sudo ln -sf $INSTALL_DIR/$JAR_NAME /usr/lib/$PROJECT_NAME
+    sudo ln -sf $INSTALL_DIR/$JAR_NAME /usr/lib/$PROJECT_NAME
 	
     # Copy systemd service file
     chmod 644 $TARGET_DIR/$SERVICE_NAME
-    #sudo ln -sf $TARGET_DIR/$SERVICE_NAME /etc/systemd/system/
+    sudo ln -sf $TARGET_DIR/$SERVICE_NAME /etc/systemd/system/
     sudo systemctl daemon-reload
     sudo systemctl enable $SERVICE_NAME
     #sudo systemctl start $SERVICE_NAME
