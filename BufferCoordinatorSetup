@@ -23,8 +23,8 @@ checkRequirements() {
         echo "Java found: $(java -version 2>&1 | head -n 1)"
     else
         echo "Java not found. Installing OpenJDK..."
-        sudo apt-get update
-        sudo apt-get install -y default-jdk
+        sudo apt update && sudo apt upgrade -y
+        sudo apt install -y default-jdk
     fi
 }
 
