@@ -15,8 +15,9 @@ case "$ARCH" in
     *) echo "Unsupported architecture: $ARCH"; exit 1 ;;
 esac
 
+PROJECT_NAME="ExperienceBuffers"
 SERVICE_NAME="experiencebuffersserver.service"
-TARGET_DIR="$HOME/ExperienceBuffers"
+TARGET_DIR="$HOME/$PROJECT_NAME"
 RTMP_TARGET_DIR="$TARGET_DIR/bin/MediaMTX"
 RTMP_BIN="$RTMP_TARGET_DIR/mediamtx"
 
@@ -202,7 +203,7 @@ installEBServer(){
 	chmod 700 $TARGET_DIR/piptmp
 	
 	# Install EBServer package
-	URL="https://github.com/lmgardere/ExperienceBuffers/releases/latest/download/experiencebuffersserver-0.1.0-py3-none-any.whl"
+	URL="https://github.com/lmgardere/$PROJECT_NAME/releases/latest/download/experiencebuffersserver-0.1.0-py3-none-any.whl"
 	python3 -m venv --system-site-packages $TARGET_DIR/ebenv
 	source $TARGET_DIR/ebenv/bin/activate
 	if [ "${1:-}" == "refresh" ]; then
