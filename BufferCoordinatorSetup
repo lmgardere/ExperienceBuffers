@@ -35,7 +35,7 @@ installJar() {
 	
 	URL="https://github.com/lmgardere/ExperienceBuffers/releases/latest/download/$JAR_NAME"
 	
-	echo "Downloading $URL"
+	echo "Downloading $JAR_NAME"
     sudo mkdir -p $INSTALL_DIR
     curl -LO "$URL"
     sudo mv $JAR_NAME $INSTALL_DIR/$JAR_NAME
