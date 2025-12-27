@@ -4,9 +4,10 @@ set -euo pipefail
 # -------------------------------------------------------------
 # CONFIGURATION
 # -------------------------------------------------------------
+PROJECT_NAME="ExperienceBuffers"
 JAR_NAME="EBCoordinator.jar"
 SERVICE_NAME="experiencebufferscoordinator.service"
-TARGET_DIR="$HOME/ExperienceBuffers"
+TARGET_DIR="$HOME/$PROJECT_NAME"
 INSTALL_DIR="${TARGET_DIR}/lib"
 
 # -------------------------------------------------------------
@@ -18,12 +19,13 @@ checkRequirements() {
 	echo
     echo "Checking system requirements..."
 
+    sudo apt update && sudo apt upgrade -y
+    
     # Check Java
     if command -v java >/dev/null 2>&1; then
         echo "Java found: $(java -version 2>&1 | head -n 1)"
     else
         echo "Java not found. Installing OpenJDK..."
-        sudo apt update && sudo apt upgrade -y
         sudo apt install -y default-jdk
     fi
 }
@@ -33,7 +35,7 @@ installJar() {
 	echo
     echo "Installing JAR..."
 	
-	URL="https://github.com/lmgardere/ExperienceBuffers/releases/latest/download/$JAR_NAME"
+	URL="https://github.com/lmgardere/$PROJECT_NAME/releases/latest/download/$JAR_NAME"
 	
 	echo "Downloading $JAR_NAME"
     sudo mkdir -p $INSTALL_DIR
@@ -54,9 +56,10 @@ createService() {
 	echo
     echo "Creating systemd service..."
 
-	sudo ln -sf $INSTALL_DIR /root
-    sudo mkdir -p /usr/lib/ExperienceBuffers
-	sudo ln -sf $INSTALL_DIR/$JAR_NAME /usr/lib/ExperienceBuffers
+    sudo mkdir -p /root/$PROJECT_NAME
+	sudo ln -sf $INSTALL_DIR /root/$PROJECT_NAME
+    sudo mkdir -p /usr/lib/$PROJECT_NAME
+	sudo ln -sf $INSTALL_DIR/$JAR_NAME /usr/lib/$PROJECT_NAME
 	
 	# Copy systemd service file
 	chmod 644 $TARGET_DIR/$SERVICE_NAME
