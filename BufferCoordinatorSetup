@@ -58,9 +58,9 @@ createService() {
     echo "Creating systemd service..."
 
     sudo mkdir -p /root/$PROJECT_NAME
-    if [ ! -e /root/$PROJECT_NAME/lib ]; then
-    	sudo ln -sf $INSTALL_DIR /root/$PROJECT_NAME
-    fi
+    #if [ ! -e /root/$PROJECT_NAME/lib ]; then
+    #	sudo ln -sf $INSTALL_DIR /root/$PROJECT_NAME
+    #fi
     sudo mkdir -p /usr/lib/$PROJECT_NAME
     #sudo ln -sf $INSTALL_DIR/$JAR_NAME /usr/lib/$PROJECT_NAME
 	
