@@ -92,7 +92,7 @@ main() {
     createService
     echo
     echo "Installation complete."
-    echo "Run \"EBCoordinator\" at the command line to start the program manually. Run using \"sudo\" if necessary."
+    echo "Run \"EBCoordinator\" to manually start the program. Run using \"sudo\" if necessary."
 }
 
 # -------------------------------------------------------------

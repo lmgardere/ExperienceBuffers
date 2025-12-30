@@ -249,7 +249,7 @@ main() {
     installEBServer
     createService
     echo "Installation complete."
-    echo "Run \"EBServer\" at the command line to start the program manually. Run using \"sudo\" if necessary."
+    echo "Run \"EBServer\" to manually start the program. Run using \"sudo\" if necessary."
 }
 
 # -------------------------------------------------------------
