@@ -54,6 +54,19 @@ installJar() {
 }
 
 # -------------------------------------------------------------
+makeExecutionScript(){
+	EXECUTABLE="$TARGET_DIR/bin/EBCoordinator"
+	
+	cat > $EXECUTABLE <<EOF
+#!/usr/bin/bash
+
+java -jar $TARGET_DIR/lib/EBCoordinator.jar
+EOF
+
+	chmod 755 $EXECUTABLE
+}
+
+# -------------------------------------------------------------
 createService() {
 	echo
     echo "Creating systemd service..."
@@ -72,19 +85,6 @@ createService() {
 }
 
 # -------------------------------------------------------------
-makeExecutionScript(){
-	EXECUTABLE="$TARGET_DIR/bin/EBCoordinator"
-	
-	cat > $EXECUTABLE <<EOF
-#!/usr/bin/bash
-
-java -jar $TARGET_DIR/lib/EBCoordinator.jar
-EOF
-
-	chmod 755 $EXECUTABLE
-}
-
-# -------------------------------------------------------------
 main() {
     echo "=== ExperienceBuffers Coordinator Installer ==="
     checkRequirements
@@ -92,6 +92,7 @@ main() {
     createService
     echo
     echo "Installation complete."
+    echo "Run \"EBCoordinator\" at the command line to start the program manually. Run using \"sudo\" if necessary."
 }
 
 # -------------------------------------------------------------
