@@ -48,6 +48,8 @@ installJar() {
 	    chmod 755 "$INSTALL_DIR/$JAR_NAME"
 	fi
 
+	makeExecutionScript
+    
     echo "JAR installed to ${INSTALL_DIR}"
 }
 
@@ -69,6 +71,19 @@ createService() {
     #sudo systemctl start $SERVICE_NAME
 
     echo "Service ${SERVICE_NAME} installed and started."
+}
+
+# -------------------------------------------------------------
+makeExecutionScript(){
+	EXECUTABLE="$TARGET_DIR/bin/EBCoordinator"
+	
+	cat > $EXECUTABLE <<EOF
+#!/usr/bin/bash
+
+java -jar $TARGET_DIR/lib/EBCoordinator.jar
+EOF
+
+	chmod 755 EXECUTABLE
 }
 
 # -------------------------------------------------------------
