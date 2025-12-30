@@ -59,10 +59,8 @@ createService() {
     echo "Creating systemd service..."
 
 	sudo ln -sf $TARGET_DIR /root
-
-    sudo mkdir -p /usr/lib/$PROJECT_NAME
-    sudo ln -sf $INSTALL_DIR/$JAR_NAME /usr/lib/$PROJECT_NAME
-	
+	sudo ln -sf $TARGET_DIR/bin/EBCoordinator /usr/local/bin	
+    
     # Copy systemd service file
     chmod 644 $TARGET_DIR/$SERVICE_NAME
     sudo ln -sf $TARGET_DIR/$SERVICE_NAME /etc/systemd/system/

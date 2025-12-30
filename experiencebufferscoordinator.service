@@ -5,13 +5,12 @@ After=default.target
 [Service]
 User=root
 Type=Simple
-ExecStart=/usr/bin/java -jar /root/ExperienceBuffers/lib/EBCoordinator.jar
+ExecStart=/usr/local/bin/EBCoordinator
 WorkingDirectory=/root/ExperienceBuffers
 Restart=always
 RestartSec=5
 StandardOutput=append:/root/ExperienceBuffers/logs/activity.log
 StandardError=inherit
-SuccessExitStatus=143
 
 [Install]
 WantedBy=default.target
