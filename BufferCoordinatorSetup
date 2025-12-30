@@ -83,7 +83,7 @@ makeExecutionScript(){
 java -jar $TARGET_DIR/lib/EBCoordinator.jar
 EOF
 
-	chmod 755 EXECUTABLE
+	chmod 755 $EXECUTABLE
 }
 
 # -------------------------------------------------------------
