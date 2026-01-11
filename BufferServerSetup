@@ -203,6 +203,8 @@ installMediaMTX(){
 # -------------------------------------------------------------
 installEBServer(){
 	echo
+	echo "Making temporary tmp space for pip..."
+	
 	# Making temporary tmp space for pip within larger user directory to avoid running out of disk space during pip installs
 	mkdir -p $TARGET_DIR/piptmp
 	chmod 700 $TARGET_DIR/piptmp
