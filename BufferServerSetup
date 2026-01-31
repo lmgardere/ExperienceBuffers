@@ -38,7 +38,7 @@ checkRequirements() {
 	sudo apt install -y python3 python3-pip python3-numpy
 	
 	# Install system-level dependencies for audio/video - ie: audio tools and ffmpeg
-	sudo apt install -y libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-dev ffmpeg
+	sudo apt install -y i2c-tools libasound2-dev libportaudio2 libportaudiocpp0 portaudio19-dev ffmpeg
 	
 	testOpenCV
 	
@@ -101,14 +101,6 @@ installPowerTool(){
     else
         echo "Loading module i2c_bcm2835"
         sudo modprobe i2c_bcm2835
-    fi
-
-    if dpkg -s i2c-tools >/dev/null 2>&1; then
-        echo "i2c-tools already installed"
-    else
-        echo "Installing i2c-tools"
-        sudo apt update
-        sudo apt install -y i2c-tools
     fi
 }
 
@@ -297,7 +289,7 @@ createService() {
 main() {
     echo "=== ExperienceBuffers Server Installer ==="
     checkRequirements
-    installPowerTools
+    installPowerTool
     installMediaMTX
     installEBServer
     createService
