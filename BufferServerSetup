@@ -63,6 +63,56 @@ checkRequirements() {
 }
 
 # -------------------------------------------------------------
+installPowerTool(){
+    echo
+    echo "Enabling I2C if needed..."
+
+    if grep -q "^dtparam=i2c_arm=on" /boot/config.txt; then
+        echo "I2C already enabled in /boot/config.txt"
+    else
+        echo "Enabling I2C in /boot/config.txt"
+        sudo sed -i '/dtparam=i2c_arm=/d' /boot/config.txt
+        echo "dtparam=i2c_arm=on" | sudo tee -a /boot/config.txt >/dev/null
+    fi
+
+    if grep -q "^i2c-dev$" /etc/modules; then
+        echo "Module i2c-dev already in /etc/modules"
+    else
+        echo "Adding i2c-dev to /etc/modules"
+        echo "i2c-dev" | sudo tee -a /etc/modules >/dev/null
+    fi
+
+    if grep -q "^i2c-bcm2835$" /etc/modules; then
+        echo "Module i2c-bcm2835 already in /etc/modules"
+    else
+        echo "Adding i2c-bcm2835 to /etc/modules"
+        echo "i2c-bcm2835" | sudo tee -a /etc/modules >/dev/null
+    fi
+
+    if lsmod | grep -q "^i2c_dev"; then
+        echo "Module i2c_dev already loaded"
+    else
+        echo "Loading module i2c_dev"
+        sudo modprobe i2c_dev
+    fi
+
+    if lsmod | grep -q "^i2c_bcm2835"; then
+        echo "Module i2c_bcm2835 already loaded"
+    else
+        echo "Loading module i2c_bcm2835"
+        sudo modprobe i2c_bcm2835
+    fi
+
+    if dpkg -s i2c-tools >/dev/null 2>&1; then
+        echo "i2c-tools already installed"
+    else
+        echo "Installing i2c-tools"
+        sudo apt update
+        sudo apt install -y i2c-tools
+    fi
+}
+
+# -------------------------------------------------------------
 testOpenCV(){
 	echo
 	echo "Testing if OpenCV + GStreamer is working..."
@@ -247,6 +297,7 @@ createService() {
 main() {
     echo "=== ExperienceBuffers Server Installer ==="
     checkRequirements
+    installPowerTools
     installMediaMTX
     installEBServer
     createService
