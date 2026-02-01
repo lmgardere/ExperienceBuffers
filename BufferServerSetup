@@ -75,6 +75,15 @@ installPowerTool(){
         echo "dtparam=i2c_arm=on" | sudo tee -a /boot/config.txt >/dev/null
     fi
 
+	#some installs use /boot/firmware/config.txt
+    if grep -q "^dtparam=i2c_arm=on" /boot/firmware/config.txt; then
+        echo "I2C already enabled in /boot/firmware/config.txt"
+    else
+        echo "Enabling I2C in /boot/firmware/config.txt"
+        sudo sed -i '/dtparam=i2c_arm=/d' /boot/firmware/config.txt
+        echo "dtparam=i2c_arm=on" | sudo tee -a /boot/firmware/config.txt >/dev/null
+    fi
+
     if grep -q "^i2c-dev$" /etc/modules; then
         echo "Module i2c-dev already in /etc/modules"
     else
