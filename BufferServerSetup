@@ -67,12 +67,24 @@ installPowerTool(){
     echo
     echo "Enabling I2C if needed..."
 
-    if grep -q "^dtparam=i2c_arm=on" /boot/config.txt; then
-        echo "I2C already enabled in /boot/config.txt"
+    if [ -f /boot/firmware/config.txt ]; then
+        CONFIG="/boot/firmware/config.txt"
     else
-        echo "Enabling I2C in /boot/config.txt"
-        sudo sed -i '/dtparam=i2c_arm=/d' /boot/config.txt
-        echo "dtparam=i2c_arm=on" | sudo tee -a /boot/config.txt >/dev/null
+        CONFIG="/boot/config.txt"
+    fi
+	
+	# Fix KMS stealing the I2C bus on Pi Zero 2 W
+	if grep -q "^dtoverlay=vc4-kms-v3d" "$CONFIG"; then
+	    echo "Switching vc4-kms-v3d → vc4-fkms-v3d to restore I2C-1"
+	    sudo sed -i 's/dtoverlay=vc4-kms-v3d/dtoverlay=vc4-fkms-v3d/' "$CONFIG"
+	fi
+
+    if grep -q "^dtparam=i2c_arm=on" "$CONFIG"; then
+        echo "I2C already enabled in $CONFIG"
+    else
+        echo "Enabling I2C in $CONFIG"
+        sudo sed -i '/dtparam=i2c_arm=/d' "$CONFIG"
+        echo "dtparam=i2c_arm=on" | sudo tee -a "$CONFIG" >/dev/null
     fi
 
 	#some installs use /boot/firmware/config.txt
