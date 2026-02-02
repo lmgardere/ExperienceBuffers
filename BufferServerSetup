@@ -282,47 +282,6 @@ installEBServer(){
 }
 
 # -------------------------------------------------------------
-install_waveshare_ups_driver() {
-    echo
-    echo "Installing Waveshare UPS HAT Python driver..."
-
-    UPS_TARGET_DIR=$(python3 - << 'EOF'
-import site
-print(site.getsitepackages()[0])
-EOF
-)
-
-    DRIVER_FILE="$UPS_TARGET_DIR/UPS.py"
-
-    echo "Using Python package directory: $TARGET_DIR"
-
-    # Check if already installed
-    if [ -f "$DRIVER_FILE" ]; then
-        echo "Waveshare UPS driver already installed at $DRIVER_FILE"
-        return
-    fi
-
-    echo "Driver not found — downloading Waveshare UPS-HAT repo"
-    TMP_DIR=$(mktemp -d)
-
-    git clone --depth 1 https://github.com/waveshare/UPS-HAT "$TMP_DIR" >/dev/null 2>&1
-
-    if [ ! -f "$TMP_DIR/code/UPS.py" ]; then
-        echo "ERROR: UPS.py not found in Waveshare repo"
-        rm -rf "$TMP_DIR"
-        return 1
-    fi
-
-    echo "Copying UPS.py to $TARGET_DIR"
-    sudo cp "$TMP_DIR/code/UPS.py" "$DRIVER_FILE"
-
-    echo "Cleaning up"
-    rm -rf "$TMP_DIR"
-
-    echo "=== Waveshare UPS driver installed successfully ==="
-}
-
-# -------------------------------------------------------------
 createService() {
 	echo
     echo "Creating systemd service..."
