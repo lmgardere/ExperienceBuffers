@@ -87,15 +87,6 @@ installPowerTool(){
         echo "dtparam=i2c_arm=on" | sudo tee -a "$CONFIG" >/dev/null
     fi
 
-	#some installs use /boot/firmware/config.txt
-    if grep -q "^dtparam=i2c_arm=on" /boot/firmware/config.txt; then
-        echo "I2C already enabled in /boot/firmware/config.txt"
-    else
-        echo "Enabling I2C in /boot/firmware/config.txt"
-        sudo sed -i '/dtparam=i2c_arm=/d' /boot/firmware/config.txt
-        echo "dtparam=i2c_arm=on" | sudo tee -a /boot/firmware/config.txt >/dev/null
-    fi
-
     if grep -q "^i2c-dev$" /etc/modules; then
         echo "Module i2c-dev already in /etc/modules"
     else
@@ -268,9 +259,11 @@ installEBServer(){
 	echo
 	echo "Making temporary tmp space for pip..."
 	
+	PIP_TMP="$TARGET_DIR/piptmp"
+	
 	# Making temporary tmp space for pip within larger user directory to avoid running out of disk space during pip installs
-	mkdir -p $TARGET_DIR/piptmp
-	chmod 700 $TARGET_DIR/piptmp
+	mkdir -p $PIP_TMP
+	chmod 700 $PIP_TMP
 	
 	# Install EBServer package
 	URL="https://github.com/lmgardere/$PROJECT_NAME/releases/latest/download/experiencebuffersserver-0.1.0-py3-none-any.whl"
@@ -279,13 +272,54 @@ installEBServer(){
 	
 	if [[ "$ARG1" == "refresh" ]]; then
 	    echo "Refreshing EBServer..."
-		TMPDIR=$TARGET_DIR/piptmp pip3 install --force-reinstall --no-deps $URL
+		TMPDIR=$PIP_TMP pip3 install --force-reinstall --no-deps $URL
 	else
 	    echo "Installing EBServer and requirements..."
-		TMPDIR=$TARGET_DIR/piptmp pip3 install $URL
+		TMPDIR=$PIP_TMP pip3 install $URL
 	fi
 	
-	rm -rf $TARGET_DIR/piptmp
+	rm -rf $PIP_TMP
+}
+
+# -------------------------------------------------------------
+install_waveshare_ups_driver() {
+    echo
+    echo "Installing Waveshare UPS HAT Python driver..."
+
+    UPS_TARGET_DIR=$(python3 - << 'EOF'
+import site
+print(site.getsitepackages()[0])
+EOF
+)
+
+    DRIVER_FILE="$UPS_TARGET_DIR/UPS.py"
+
+    echo "Using Python package directory: $TARGET_DIR"
+
+    # Check if already installed
+    if [ -f "$DRIVER_FILE" ]; then
+        echo "Waveshare UPS driver already installed at $DRIVER_FILE"
+        return
+    fi
+
+    echo "Driver not found — downloading Waveshare UPS-HAT repo"
+    TMP_DIR=$(mktemp -d)
+
+    git clone --depth 1 https://github.com/waveshare/UPS-HAT "$TMP_DIR" >/dev/null 2>&1
+
+    if [ ! -f "$TMP_DIR/code/UPS.py" ]; then
+        echo "ERROR: UPS.py not found in Waveshare repo"
+        rm -rf "$TMP_DIR"
+        return 1
+    fi
+
+    echo "Copying UPS.py to $TARGET_DIR"
+    sudo cp "$TMP_DIR/code/UPS.py" "$DRIVER_FILE"
+
+    echo "Cleaning up"
+    rm -rf "$TMP_DIR"
+
+    echo "=== Waveshare UPS driver installed successfully ==="
 }
 
 # -------------------------------------------------------------
