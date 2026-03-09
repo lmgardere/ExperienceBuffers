@@ -1,4 +1,4 @@
-#!/usr/bin/bash
+#!/bin/bash
 set -euo pipefail
 
 # -------------------------------------------------------------
@@ -56,10 +56,8 @@ installJar() {
 # -------------------------------------------------------------
 makeExecutionScript(){
 	EXECUTABLE="$TARGET_DIR/bin/EBCoordinator"
-	echo "${TARGET_DIR}"
-	echo "$TARGET_DIR"
-	echo $TARGET_DIR
 	
+	echo $TARGET_DIR
 	cat > $EXECUTABLE <<EOF
 #!/usr/bin/bash
 
@@ -74,9 +72,6 @@ createService() {
 	echo
     echo "Creating systemd service..."
 
-	echo "${TARGET_DIR}"
-	echo "$TARGET_DIR"
-	echo $TARGET_DIR
 	sudo ln -sf $TARGET_DIR /root
 	sudo ln -sf $TARGET_DIR/bin/EBCoordinator /usr/local/bin	
     
