@@ -57,7 +57,6 @@ installJar() {
 makeExecutionScript(){
 	EXECUTABLE="$TARGET_DIR/bin/EBCoordinator"
 	
-	echo $TARGET_DIR
 	cat > $EXECUTABLE <<EOF
 #!/usr/bin/bash
 
