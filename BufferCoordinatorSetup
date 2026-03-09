@@ -8,7 +8,7 @@ PROJECT_NAME="ExperienceBuffers"
 JAR_NAME="EBCoordinator.jar"
 SERVICE_NAME="experiencebufferscoordinator.service"
 TARGET_DIR="$HOME/$PROJECT_NAME"
-INSTALL_DIR="${TARGET_DIR}/lib"
+INSTALL_DIR="$TARGET_DIR/lib"
 
 # -------------------------------------------------------------
 # FUNCTIONS
@@ -71,6 +71,9 @@ createService() {
 	echo
     echo "Creating systemd service..."
 
+	echo "${TARGET_DIR}"
+	echo "$TARGET_DIR"
+	echo $TARGET_DIR
 	sudo ln -sf $TARGET_DIR /root
 	sudo ln -sf $TARGET_DIR/bin/EBCoordinator /usr/local/bin	
     
