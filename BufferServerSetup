@@ -302,11 +302,16 @@ createService() {
 # -------------------------------------------------------------
 main() {
     echo "=== ExperienceBuffers Server Installer ==="
-    checkRequirements
-    installPowerTool
-    installMediaMTX
-    installEBServer
-    createService
+    if [[ "$ARG1" == "refresh" ]]; then
+	    installEBServer
+	else
+	    checkRequirements
+	    installPowerTool
+	    installMediaMTX
+	    installEBServer
+	    createService
+	fi
+	
     echo "Installation complete."
     echo "Run \"EBServer\" to manually start the program. Run using \"sudo\" if necessary."
 }
