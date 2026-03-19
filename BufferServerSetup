@@ -266,12 +266,8 @@ installEBServer(){
 	chmod 700 $PIP_TMP
 	
 	# Install EBServer package
-	if [[ "$ARG1" == "refresh" ]]; then
-		echo "Activating the python ebenv virtual environment..."
-	else
-		echo "Setting up python virtual environment..."
-		python3 -m venv --system-site-packages $TARGET_DIR/ebenv
-	fi
+	echo "Setting up python virtual environment..."
+	python3 -m venv --system-site-packages $TARGET_DIR/ebenv
 	source $TARGET_DIR/ebenv/bin/activate
 	
 	URL="https://github.com/lmgardere/$PROJECT_NAME/releases/latest/download/experiencebuffersserver-0.1.0-py3-none-any.whl"
