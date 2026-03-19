@@ -316,6 +316,7 @@ main() {
 	
     echo "Installation complete."
     echo "Run \"EBServer\" to manually start the program. Run using \"sudo\" if necessary."
+    echo
 }
 
 # -------------------------------------------------------------
