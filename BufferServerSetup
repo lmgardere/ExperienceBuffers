@@ -267,10 +267,10 @@ installEBServer(){
 	
 	# Install EBServer package
 	if [[ "$ARG1" == "refresh" ]]; then
+		echo "Activating the python ebenv virtual environment..."
+	else
 		echo "Setting up python virtual environment..."
 		python3 -m venv --system-site-packages $TARGET_DIR/ebenv
-	else
-		echo "Activating the python ebenv virtual environment..."
 	fi
 	source $TARGET_DIR/ebenv/bin/activate
 	
