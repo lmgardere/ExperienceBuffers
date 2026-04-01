@@ -272,7 +272,7 @@ installEBServer(){
 	
 	URL="https://github.com/lmgardere/$PROJECT_NAME/releases/latest/download/experiencebuffersserver-0.1.0-py3-none-any.whl"
 
-	STAMP="$(date '+%a, %b %d %I:%M:%S %p %Z %Y' | sed 's/ 0/ /')"
+	STAMP="$(date '+%a, %b %d %I:%M:%S %p %Z %Y' | sed 's/ 0/ /g')"
 	if [[ "$ARG1" == "refresh" ]]; then
 	    echo "Refreshing EBServer..."
 		TMPDIR=$PIP_TMP pip3 install --force-reinstall --no-deps $URL
